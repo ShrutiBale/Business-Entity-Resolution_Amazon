@@ -1,0 +1,37 @@
+{
+  "is_mock_data": true,
+  "macro_f05": 0.847,
+  "singleton_f05": 0.913,
+  "non_singleton_f05": 0.798,
+  "blocking_recall": 0.963,
+  "pair_precision": 0.871,
+  "pair_recall": 0.812,
+  "mean_candidates_per_s1": 4.2,
+  "p95_candidates_per_s1": 18.0,
+  "max_candidates": 47,
+  "prediction_distribution": {
+    "zero_matches": 0.31,
+    "one_match": 0.48,
+    "two_plus_matches": 0.21
+  },
+  "error_taxonomy": {
+    "BLOCKING_MISS": 4,
+    "NAME_VARIATION": 7,
+    "ADDRESS_VARIATION": 5,
+    "TRANSLITERATION": 3,
+    "ABBREVIATION": 6,
+    "DBA_VARIATION": 2,
+    "WORD_ORDER": 2,
+    "TYPO": 4,
+    "NUMERIC_MISMATCH": 3,
+    "GENERIC_NAME_COLLISION": 5,
+    "CHAIN_FRANCHISE_COLLISION": 4,
+    "FALSE_POSITIVE": 3,
+    "THRESHOLD_ERROR": 2,
+    "SINGLETON_ERROR": 2,
+    "MULTI_MATCH_ERROR": 1,
+    "COUNTRY_SHIFT": 0,
+    "DATA_ANOMALY": 1
+  },
+  "validation_note": "DEMO DATA \u2014 NOT REAL VALIDATION. Replace data files with real pipeline exports for live metrics."
+}
