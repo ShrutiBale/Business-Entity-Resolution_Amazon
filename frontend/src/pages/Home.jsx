@@ -37,12 +37,12 @@ const KEY_IDEAS = [
 ];
 
 const SHOWCASE_TAGS = [
-  { tag: "singleton",       label: "Singleton",         color: "badge-red",    desc: "No match — correctly empty" },
-  { tag: "single_match",    label: "Single Match",       color: "badge-green",  desc: "One clean or noisy match" },
-  { tag: "multi_match",     label: "Multi-Match",        color: "badge-blue",   desc: "Many S2/S3 records → one S1" },
-  { tag: "chain_collision", label: "Chain Collision",    color: "badge-orange", desc: "Same name, different branches" },
-  { tag: "transliteration", label: "Noisy/Transliter.",  color: "badge-yellow", desc: "Phonetic or script variation" },
-  { tag: "france",          label: "🇫🇷 France",          color: "badge-purple", desc: "Unseen domain — open-set" },
+  { tag: "singleton",       label: "Singleton",         color: "badge-red",    desc: "No match — all candidates correctly rejected (verified against training ground truth)" },
+  { tag: "single_match",    label: "Single Match",       color: "badge-green",  desc: "One clean or noisy match (verified against training ground truth)" },
+  { tag: "multi_match",     label: "Multi-Match",        color: "badge-blue",   desc: "Many S2/S3 records → one S1 (verified against training ground truth)" },
+  { tag: "chain_collision", label: "Chain Collision",    color: "badge-orange", desc: "Same name, different branches (verified against training ground truth)" },
+  { tag: "transliteration", label: "Noisy/Transliter.",  color: "badge-yellow", desc: "Phonetic or script variation (verified against training ground truth)" },
+  { tag: "france",          label: "🇫🇷 France",          color: "badge-purple", desc: "Unseen domain — pipeline PREDICTION only. No ground truth exists for any test entity." },
 ];
 
 export default function Home() {
@@ -139,7 +139,18 @@ export default function Home() {
             </button>
           ))}
         </div>
+        </div>
+        {/* Fix 8: training vs test provenance note */}
+        <div style={{
+          marginTop: 16, padding: "12px 16px",
+          background: "rgba(191,90,242,0.06)", border: "1px solid rgba(191,90,242,0.25)",
+          borderRadius: "var(--radius)", fontSize: 12.5, color: "var(--text-secondary)", lineHeight: 1.7
+        }}>
+          <strong style={{ color: "var(--text-primary)" }}>Training vs. Test Provenance:</strong>{" "}
+          Training-derived examples (all non-France cases) show verified accuracy — ground truth exists and was checked in S1-grouped CV + holdout evaluation.
+          Test-derived examples — <strong>including every France case</strong> — show what the frozen pipeline predicts on genuinely unseen data.
+          This is inherent to the challenge: test ground truth is never available to any participant, not a limitation of this demo.
+        </div>
       </div>
-    </div>
   );
 }

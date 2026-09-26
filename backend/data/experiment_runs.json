@@ -65,7 +65,7 @@
     "recall": 0.812,
     "singleton_f05": 0.913,
     "non_singleton_f05": 0.798,
-    "notes": "LightGBM with full feature set. name_freq + numeric evidence reduces chain FPs. Current best."
+    "notes": "LightGBM with full feature set. name_freq_s1/s2/s3 + numeric evidence reduces chain FPs. Current best."
   },
   {
     "run_id": "RUN-005",

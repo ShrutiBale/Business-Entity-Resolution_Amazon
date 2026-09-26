@@ -11,6 +11,18 @@ class S1Entity(BaseModel):
     country: str
     case_tag: str
     case_description: str
+    # Fix 8: distinguish verified training examples from unverifiable test examples
+    ground_truth_source: str  # "train_holdout" | "test_unverified"
+
+
+class CrossSourceSupport(BaseModel):
+    """Fix 2: structured triangulation evidence (approch.md §13).
+    Only populated when both an S2 and S3 candidate exist for the same S1.
+    Never a decision mechanism — supporting evidence only.
+    """
+    s2_s3_name_similarity: float
+    s2_s3_address_similarity: float
+    numeric_agreement: bool
 
 
 class Candidate(BaseModel):
@@ -25,15 +37,27 @@ class Candidate(BaseModel):
     address_similarity: float
     composite_similarity: float
     country_relation: str
+    # Address component-level features (Fix 4 — approch.md §4.2, §11.2)
     pin_postal_match: bool
     house_number_match: bool
+    street_name_similarity: float          # new: component-level street name
+    unit_suite_match: Optional[bool] = None  # new: null when not applicable
+    # TF-IDF channel ranks (Fix 3 — approch.md §11.4)
     tfidf_name_rank: Optional[int] = None
     tfidf_address_rank: Optional[int] = None
+    tfidf_composite_rank: Optional[int] = None  # new: third channel
     blocking_passes: List[str] = []
     blocking_pass_count: int = 0
-    name_frequency: float
+    # Fix 1: split name_frequency by source (approch.md §11.5)
+    name_frequency_s1: float   # fold-local during CV
+    name_frequency_s2: float   # source-wide (S2 never partitioned by fold)
+    name_frequency_s3: float   # source-wide (S3 never partitioned by fold)
     numeric_evidence: float
-    cross_source_support: bool
+    # Fix 2: structured cross-source triangulation (null when only one source)
+    cross_source_support: Optional[CrossSourceSupport] = None
+    # Fix 5: near-duplicate cluster tagging (approch.md §3.4) — context only
+    cluster_id: Optional[str] = None   # within-source cluster ID
+    cluster_size: int = 1              # 1 = no near-duplicates found
     notes: str = ""
 
 
