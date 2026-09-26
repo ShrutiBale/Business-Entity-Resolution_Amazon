@@ -168,3 +168,56 @@ def get_showcase():
         "france": tag_priority.get("france"),
         "address_variation": tag_priority.get("address_variation"),
     }
+
+
+# ─── Export / Download endpoints (modity2.md §17) ────────────────────────────
+from pathlib import Path as _Path
+from fastapi.responses import FileResponse as _FileResponse
+
+_OUTPUT_DIR = _Path(__file__).parent.parent / "output"
+
+
+@app.get(
+    "/api/export/candidate_pairs.tsv",
+    summary="Download candidate_pairs.tsv",
+    description=(
+        "Download the exact final test candidate set fed into the matching model. "
+        "Generated from the supplied challenge dataset and the current frozen pipeline outputs. "
+        "NOT a mock/demo export."
+    ),
+)
+async def download_candidate_pairs():
+    f = _OUTPUT_DIR / "candidate_pairs.tsv"
+    if not f.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="candidate_pairs.tsv not found. Run ml/inference.py first to generate it from real test data.",
+        )
+    return _FileResponse(
+        path=str(f),
+        media_type="text/tab-separated-values",
+        headers={"Content-Disposition": 'attachment; filename="candidate_pairs.tsv"'},
+    )
+
+
+@app.get(
+    "/api/export/matching_results.tsv",
+    summary="Download matching_results.tsv",
+    description=(
+        "Download the final test predictions. "
+        "Generated from the supplied challenge dataset and the current frozen pipeline outputs. "
+        "NOT a mock/demo export."
+    ),
+)
+async def download_matching_results():
+    f = _OUTPUT_DIR / "matching_results.tsv"
+    if not f.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="matching_results.tsv not found. Run ml/inference.py first to generate it from real test data.",
+        )
+    return _FileResponse(
+        path=str(f),
+        media_type="text/tab-separated-values",
+        headers={"Content-Disposition": 'attachment; filename="matching_results.tsv"'},
+    )

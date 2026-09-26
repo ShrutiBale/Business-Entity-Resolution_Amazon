@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic
+pandas
+lightgbm
+scikit-learn
+jellyfish
+unidecode
+rapidfuzz
+numpy

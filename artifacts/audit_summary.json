@@ -1,0 +1,10 @@
+{
+  "train_s1_rows": 2206821,
+  "train_s2_rows": 5034616,
+  "train_s3_rows": 5285603,
+  "train_gt_rows": 2206821,
+  "test_s1_rows": 1732544,
+  "test_s2_rows": 4887273,
+  "test_s3_rows": 5082316,
+  "s2_s3_record_reuse_count": 0
+}

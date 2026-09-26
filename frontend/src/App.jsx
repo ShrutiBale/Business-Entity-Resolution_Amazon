@@ -5,6 +5,7 @@ import EntityDetail from "./pages/EntityDetail";
 import MetricsDashboard from "./pages/MetricsDashboard";
 import Experiments from "./pages/Experiments";
 import Methodology from "./pages/Methodology";
+import Downloads from "./pages/Downloads";
 
 function Navbar() {
   return (
@@ -20,8 +21,11 @@ function Navbar() {
         <NavLink to="/metrics" className={({ isActive }) => isActive ? "active" : ""}>Metrics</NavLink>
         <NavLink to="/experiments" className={({ isActive }) => isActive ? "active" : ""}>Experiments</NavLink>
         <NavLink to="/methodology" className={({ isActive }) => isActive ? "active" : ""}>Methodology</NavLink>
+        <NavLink to="/downloads" className={({ isActive }) => isActive ? "active" : ""}>
+          ⬇ Downloads
+        </NavLink>
       </div>
-      <span className="navbar-badge">DEMO DATA</span>
+      <span className="navbar-badge">REAL DATA</span>
     </nav>
   );
 }
@@ -39,6 +43,7 @@ export default function App() {
             <Route path="/metrics" element={<MetricsDashboard />} />
             <Route path="/experiments" element={<Experiments />} />
             <Route path="/methodology" element={<Methodology />} />
+            <Route path="/downloads" element={<Downloads />} />
           </Routes>
         </main>
       </div>
