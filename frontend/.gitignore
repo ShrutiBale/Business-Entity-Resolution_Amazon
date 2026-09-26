@@ -22,3 +22,22 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+*.tsv
+*.csv
+# Data folders
+
+data/
+dataset/
+datasets/
+
+# Other common dataset formats
+
+*.xlsx
+*.xls
+*.json
+*.parquet
+*.pkl
+*.pickle
+*.npy
+*.npz

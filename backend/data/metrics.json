@@ -1,0 +1,17 @@
+{
+  "is_mock_data": false,
+  "macro_f05": 0.0655,
+  "blocking_recall": 0.0103,
+  "global_threshold": 0.3,
+  "n_train_s1": 5000,
+  "n_candidates": 217184,
+  "validation_note": "Real 5-fold CV on real training data (dev sample, 5K S1). Run python3 train.py for full training.",
+  "prediction_distribution": {
+    "zero_matches": 0.9986,
+    "one_match": 0.0007,
+    "two_plus_matches": 0.0007
+  },
+  "n_test_s1_total": 1732544,
+  "n_test_s1_with_match": 2440,
+  "error_taxonomy": {}
+}

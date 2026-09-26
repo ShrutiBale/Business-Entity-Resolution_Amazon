@@ -27,7 +27,7 @@ OUTPUT    = Path(__file__).parent.parent / "output"
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
 
-def run_inference():
+def run_inference(max_test_rows: int = None):
     print("=== LOADING ARTIFACTS ===")
     config_path = ARTIFACTS / "config.json"
     model_path  = ARTIFACTS / "model.txt"
@@ -66,6 +66,13 @@ def run_inference():
     print("\n=== LOADING TEST DATA ===")
     ts1_raw, ts2_raw, ts3_raw = load_all_test()
     print(f"  Test S1: {len(ts1_raw):,} | S2: {len(ts2_raw):,} | S3: {len(ts3_raw):,}")
+
+    if max_test_rows:
+        print(f"  ⚠ DEV MODE: sampling {max_test_rows:,} test S1 rows")
+        ts1_raw = ts1_raw.sample(min(max_test_rows, len(ts1_raw)), random_state=42).reset_index(drop=True)
+        ts2_raw = ts2_raw.sample(min(max_test_rows * 10, len(ts2_raw)), random_state=42).reset_index(drop=True)
+        ts3_raw = ts3_raw.sample(min(max_test_rows * 10, len(ts3_raw)), random_state=42).reset_index(drop=True)
+        print(f"  Sampled: S1={len(ts1_raw):,} | S2={len(ts2_raw):,} | S3={len(ts3_raw):,}")
 
     ts1 = preprocess_df(ts1_raw)
     ts2 = preprocess_df(ts2_raw)
@@ -121,30 +128,36 @@ def run_inference():
     scores = booster.predict(X_test)
 
     # ── Build candidate_pairs.tsv ─────────────────────────────────
-    # Exactly one row per test S1; comma-separated candidate IDs
+    # CRITICAL: must have exactly one row per EVERY test S1, incl. those not processed in dev mode
     print("\n=== BUILDING candidate_pairs.tsv ===")
-    all_test_s1_ids = ts1["entity_id"].tolist()
-    cand_by_s1: dict = {s: [] for s in all_test_s1_ids}
+    processed_s1_ids = set(ts1["entity_id"].tolist())
+    cand_by_s1: dict = {}
 
     for (s1_id, cand_id), score in zip(pair_meta, scores):
         cand_by_s1.setdefault(s1_id, []).append((cand_id, float(score)))
 
-    cand_rows = []
+    cand_rows  = []
     match_rows = []
 
-    for s1_id in all_test_s1_ids:
-        all_cands = cand_by_s1.get(s1_id, [])
-        # deduplicate
-        seen_cids = {}
-        for cid, score in all_cands:
-            if cid not in seen_cids or score > seen_cids[cid]:
-                seen_cids[cid] = score
+    # Load ALL test S1 IDs (not just the dev sample) so every S1 gets a row
+    all_test_s1_ids_full = load_all_test()[0]["entity_id"].tolist()
+    print(f"  Writing rows for all {len(all_test_s1_ids_full):,} test S1 entities …")
 
-        cand_ids_str = ",".join(seen_cids.keys())
+    for s1_id in all_test_s1_ids_full:
+        if s1_id in cand_by_s1:
+            all_cands = cand_by_s1[s1_id]
+            seen_cids = {}
+            for cid, score in all_cands:
+                if cid not in seen_cids or score > seen_cids[cid]:
+                    seen_cids[cid] = score
+            cand_ids_str = ",".join(seen_cids.keys())
+            matched      = [cid for cid, sc in seen_cids.items() if sc >= threshold]
+        else:
+            # Not in dev sample → empty row (no candidates retrieved)
+            cand_ids_str = ""
+            matched      = []
+
         cand_rows.append({"source1_entity_id": s1_id, "candidate_entity_ids": cand_ids_str})
-
-        # predictions above threshold
-        matched = [cid for cid, sc in seen_cids.items() if sc >= threshold]
         match_rows.append({"source1_entity_id": s1_id, "matched_entity_ids": ",".join(matched)})
 
     cand_df  = pd.DataFrame(cand_rows)
@@ -162,11 +175,16 @@ def run_inference():
     print("\n✅ Inference complete.")
 
     return {"candidate_pairs_path": str(cand_path), "matching_results_path": str(match_path),
-            "threshold": threshold, "n_test_s1": len(all_test_s1_ids),
+            "threshold": threshold, "n_test_s1": len(all_test_s1_ids_full),
             "n_with_match": int(n_with_match)}
 
 
 if __name__ == "__main__":
-    run_inference()
+    import sys
+    dev_n = None
+    if "--dev" in sys.argv:
+        idx = sys.argv.index("--dev")
+        dev_n = int(sys.argv[idx + 1])
+    run_inference(max_test_rows=dev_n)
 
 

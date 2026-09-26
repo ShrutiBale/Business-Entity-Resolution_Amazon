@@ -16,7 +16,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
 
-from normalization import normalize_row
+from normalization import normalize_row, preprocess_df_fast
 
 ARTIFACTS = Path(__file__).parent.parent / "artifacts"
 ARTIFACTS.mkdir(parents=True, exist_ok=True)
@@ -24,9 +24,8 @@ ARTIFACTS.mkdir(parents=True, exist_ok=True)
 
 # ─── Preprocess dataframe ──────────────────────────────────────────
 def preprocess_df(df: pd.DataFrame) -> pd.DataFrame:
-    rows = df.apply(lambda row: normalize_row(row.to_dict()), axis=1)
-    out  = pd.DataFrame(rows.tolist())
-    return out
+    """Vectorized normalization — uses pandas string ops, not per-row apply."""
+    return preprocess_df_fast(df)
 
 
 # ─── Pass A — exact structured keys ───────────────────────────────
